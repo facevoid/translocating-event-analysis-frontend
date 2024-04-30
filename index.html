@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feature Filter and Plot</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Data Visualization Dashboard</h1>
+    <div class="controls">
+        <div class="control-row">
+            <div class="slider-container">
+                <input type="checkbox" id="durationCheckbox" checked>
+                <label for="durationSlider">Duration (seconds):</label>
+                <div id="durationSlider" class="slider"></div>
+                <span id="durationValue">0.000964 - 0.001500</span>
+            </div>
+            <div class="slider-container">
+                <input type="checkbox" id="depthCheckbox" checked>
+                <label for="depthSlider">Depth (units):</label>
+                <div id="depthSlider" class="slider"></div>
+                <span id="depthValue">100 - 700</span>
+            </div>
+        </div>
+        <div class="control-row">
+            <div class="slider-container">
+                <input type="checkbox" id="areaCheckbox" checked>
+                <label for="areaSlider">Area (units²):</label>
+                <div id="areaSlider" class="slider"></div>
+                <span id="areaValue">1.5 - 2.5</span>
+            </div>
+            <div class="slider-container">
+                <input type="checkbox" id="inflectionCheckbox" checked>
+                <label for="inflectionSlider">Inflection Points (count):</label>
+                <div id="inflectionSlider" class="slider"></div>
+                <span id="inflectionValue">5 - 1200</span>
+            </div>
+        </div>
+        <button id="updateButton">Update Plot</button>
+    </div>
+    <div class="pagination">
+        <button data-direction="-1">Prev</button>
+        <span id="currentPage">1</span>
+        <button data-direction="1">Next</button>
+    </div>
+    <div id="plotArea" class="plot-area"></div>
+    <script src="script.js"></script>
+</body>
+</html>
