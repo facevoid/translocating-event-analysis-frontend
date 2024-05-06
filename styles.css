@@ -3,92 +3,130 @@ body {
     margin: 20px;
     background-color: #f4f4f4;
     color: #333;
-}
-
-h1 {
+  }
+  
+  h1 {
     text-align: center;
     color: #444;
-}
-
-.controls {
+  }
+  
+  .controls {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-bottom: 20px;
-}
-
-.control-row {
+  }
+  
+  .control-row {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-}
-
-.slider-container {
+    gap: 70px;
+  }
+  
+  .slider-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.slider-container label {
+    min-width: 150px;
+  }
+  
+  .label-container {
+    display: flex;
+    gap: 10px;
     margin-bottom: 5px;
-}
-
-.slider {
+  }
+  
+  .label-container input {
+    cursor: pointer;
+  }
+  
+  .label-container label {
+    margin-bottom: 0px !important;
+  }
+  
+  .slider-container label {
+    margin-bottom: 5px;
+  }
+  
+  .slider {
     width: 100%;
     margin-top: 5px; /* Added to ensure vertical spacing between label and slider */
-}
-
-/* Custom styles for jQuery UI Slider */
-.ui-slider .ui-slider-handle {
+  }
+  
+  /* Custom styles for jQuery UI Slider */
+  .ui-slider .ui-slider-handle {
     position: absolute;
     z-index: 2;
     width: 1.2em;
     height: 1.2em;
     cursor: pointer;
     border-radius: 50%;
-    background-color: #007BFF; /* Blue to match other controls */
-}
-
-.ui-slider .ui-slider-range {
+    background-color: #007bff; /* Blue to match other controls */
+  }
+  
+  .ui-slider .ui-slider-range {
     position: absolute;
     z-index: 1;
-    background-color: #007BFF; /* Blue to match the handle */
-}
-
-button {
+    background-color: #007bff; /* Blue to match the handle */
+  }
+  
+  button {
     padding: 8px 16px;
     font-size: 16px;
-    background-color: #007BFF;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     margin-top: 20px;
     transition: background-color 0.3s;
-}
-
-button:hover {
+  }
+  
+  button:hover {
     background-color: #0056b3;
-}
-
-.plot-area {
+  }
+  
+  .plot-area {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
     align-items: flex-start;
     gap: 10px;
     margin-top: 20px;
+  }
+  
+  .chart-container {
+    width: calc(50% - 10px);
+    margin-bottom: 20px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  }
+  .results-display {
+    text-align: right;
+    margin-right: 20px;
+    margin-top: 5px;
 }
 
 .chart-container {
+    position: relative;
     width: calc(50% - 10px);
     margin-bottom: 20px;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 }
-
-@media (max-width: 768px) {
-    .chart-container {
-        width: 100%;
-    }
+.no-scroll {
+  overflow: hidden;
 }
+
+.chart-title {
+    position: absolute;
+    top: -20px;
+    left: 10px;
+    font-size: 14px;
+    color: #333;
+}
+ 
+  @media (max-width: 768px) {
+    .chart-container {
+      width: 100%;
+    }
+  }

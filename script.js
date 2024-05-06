@@ -10,25 +10,30 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function initializeSliders() {
+    const minVal = 0.00080;
+    const maxVal = 0.10;
+    const logMin = Math.log(minVal);
+    const logMax = Math.log(maxVal);
+
     $("#durationSlider").slider({
         range: true,
-        min: Math.round(0.000950 * durationScaleFactor),  // Scale and convert to integer
-        max: Math.round(0.001500 * durationScaleFactor),  // Scale and convert to integer
-        values: [Math.round(0.000964 * durationScaleFactor), Math.round(0.072732 * durationScaleFactor)],
-        step: 0.00001,
+        min: logMin,
+        max: logMax,
+        values: [Math.log(0.00080), Math.log(0.1)],
+        step: 0.001, // Adjust the step to a reasonable increment in the logarithmic scale
         slide: function(event, ui) {
-            // Display the scaled values converted back to floats
-            $("#durationValue").text(
-                (ui.values[0] / durationScaleFactor).toFixed(6) + ' - ' + (ui.values[1] / durationScaleFactor).toFixed(6)
-            );
+            // Convert log values back to linear scale for display
+            const val1 = Math.exp(ui.values[0]);
+            const val2 = Math.exp(ui.values[1]);
+            $("#durationValue").text(val1.toFixed(6) + ' - ' + val2.toFixed(6));
         }
     });
 
     $("#depthSlider").slider({
         range: true,
-        min: 100,
-        max: 700,
-        values: [100, 700],
+        min: 0,
+        max: 1900,
+        values: [0, 1900],
         step: 50, 
         slide: function(event, ui) {
             $("#depthValue").text(ui.values[0] + ' - ' + ui.values[1]);
@@ -37,9 +42,9 @@ function initializeSliders() {
 
     $("#areaSlider").slider({
         range: true,
-        min: 10,
-        max: 100,
-        values: [20, 50],
+        min: 0,
+        max: 10,
+        values: [0, 10],
         slide: function(event, ui) {
             $("#areaValue").text(ui.values[0] + ' - ' + ui.values[1]);
         }
@@ -47,9 +52,9 @@ function initializeSliders() {
 
     $("#inflectionSlider").slider({
         range: true,
-        min: 5,
-        max: 1200,
-        values: [5, 1200],
+        min: 1,
+        max: 1600,
+        values: [1, 1600],
         slide: function(event, ui) {
             $("#inflectionValue").text(ui.values[0] + ' - ' + ui.values[1]);
         }
@@ -64,40 +69,92 @@ function attachEventHandlers() {
         const direction = $(this).data('direction');
         changePage(direction);
     });
+
+    // Checkbox bindings
+    ['durationCheckbox', 'depthCheckbox', 'areaCheckbox', 'inflectionCheckbox'].forEach(checkboxId => {
+        bindCheckboxWithSlider(checkboxId);
+    });
 }
 
-function appendSliderValuesToParams(checkboxId, sliderId, params, startParam, endParam, scaleFactor = 1) {
-    const checkbox = document.getElementById(checkboxId);
-    if (checkbox.checked) {
-        const slider = $(sliderId).slider("option", "values");
-        // Scale down the slider values if necessary before appending to parameters
-        const start = (slider[0] / scaleFactor).toFixed(6);  // Ensure that the number is formatted correctly
-        const end = (slider[1] / scaleFactor).toFixed(6);
-        params.append(startParam, start);
-        params.append(endParam, end);
-    }
+function bindCheckboxWithSlider(checkboxId) {
+    const sliderId = '#' + checkboxId.replace('Checkbox', 'Slider');
+    $('#' + checkboxId).change(function() {
+        if (this.checked) {
+            $(sliderId).slider('enable');
+            $('#plotArea').removeClass('no-scroll');
+        } else {
+            $(sliderId).slider('disable');
+            $('#plotArea').addClass('no-scroll');
+        }
+    });
 }
+
+
+// function appendSliderValuesToParams(checkboxId, sliderId, params, startParam, endParam,  scaleFactor = null) {
+//     const checkbox = document.getElementById(checkboxId);
+//     console.log('test')
+//     if (checkbox.checked) {
+//         const slider = $(sliderId).slider("option", "values");
+//         // Scale down the slider values if necessary before appending to parameters
+//         // const start = (slider[0] / scaleFactor).toFixed(6);  // Ensure that the number is formatted correctly
+//         // const end = (slider[1] / scaleFactor).toFixed(6);
+//         if (scaleFactor == 1) {
+//             // If scaleFactor is provided, apply exponential conversion
+//             start = Math.exp(slider[0] / scaleFactor).toFixed(6);
+//             end = Math.exp(slider[1] / scaleFactor).toFixed(6);
+//             console.log(start)
+//             console.log("Using Exponential Conversion:", start, end);
+
+//         } else {
+//             // If no scaleFactor is provided, use the values directly
+//             start = slider[0].toFixed(6);
+//             end = slider[1].toFixed(6);
+//             console.log("Using Conversion:", start, end);
+
+//         }
+//         params.append(startParam, start);
+//         params.append(endParam, end);
+//     }
+// }
 
 function fetchData() {
+    const plotArea = $('#plotArea');
+    plotArea.html('<img src="images/loading.gif" class="loading" alt="Loading..." style="display: block; margin: auto; width: 50px; height: 50px;"  />');   // Show loading indicator
+
     const params = new URLSearchParams({ page: currentPage, size: plotsPerPage });
-    appendSliderValuesToParams('durationCheckbox', '#durationSlider', params, 'durationStart', 'durationEnd', durationScaleFactor);
+    appendSliderValuesToParams('durationCheckbox', '#durationSlider', params, 'durationStart', 'durationEnd', scaleFactor=1);
 
     // appendSliderValuesToParams('durationCheckbox', '#durationSlider', params, 'durationStart', 'durationEnd');
-    appendSliderValuesToParams('depthCheckbox', '#depthSlider', params, 'depthStart', 'depthEnd');
-    appendSliderValuesToParams('areaCheckbox', '#areaSlider', params, 'areaStart', 'areaEnd');
-    appendSliderValuesToParams('inflectionCheckbox', '#inflectionSlider', params, 'inflectionStart', 'inflectionEnd');
+    appendSliderValuesToParams('depthCheckbox', '#depthSlider', params, 'depthStart', 'depthEnd', scaleFactor=0);
+    appendSliderValuesToParams('areaCheckbox', '#areaSlider', params, 'skewnessStart', 'skewnessEnd', scaleFactor=0);
+    appendSliderValuesToParams('inflectionCheckbox', '#inflectionSlider', params, 'inflectionStart', 'inflectionEnd', scaleFactor=0);
     console.log(`Fetching data with parameters: ${params.toString()}`);
     fetch(`http://localhost:8000/get-data?${params.toString()}`)
         .then(handleResponse)
-        .then(updatePlotArea)
-        .catch(handleFetchError);
+        .then(data => {
+            updatePlotArea(data);
+            $('.loading').remove(); // Remove loading image after data is loaded
+        })
+        .catch(error => {
+            handleFetchError(error);
+            $('.loading').remove(); // Remove loading image in case of fetch error
+        });
+
 }
 
 function appendSliderValuesToParams(checkboxId, sliderId, params, startParam, endParam) {
     if ($('#' + checkboxId).is(':checked')) {
         let values = $(sliderId).slider("values");
-        params.append(startParam, values[0]);
-        params.append(endParam, values[1]);
+        if (scaleFactor==1){
+            params.append(startParam, Math.exp(values[0]));
+            params.append(endParam, Math.exp(values[1]));
+        }
+        else {
+            params.append(startParam, values[0]);
+            params.append(endParam, values[1]);
+
+        }
+        
     }
 }
 
@@ -114,30 +171,50 @@ function updatePlotArea(datasets) {
 
     if (datasets.length === 0) {
         plotArea.text('No data available');
+        $('#filteredResults').text(`Filtered: 0`);
+        $('#percentageResults').text(`0 %`)
         return;
     }
-
+    // Update filtered and total files count
+    $('#filteredResults').text(`Filtered: ${datasets[0].filtered_files}`);
+    $('#totalResults').text(`Total: ${datasets[0].total_files}`);
+    $('#percentageResults').text(`Percentage: ${datasets[0].total_files > 0 ? ((datasets[0].filtered_files / datasets[0].total_files) * 100).toFixed(2) : 0}%`);
+ 
     datasets.forEach(createChart);
 }
 
 function createChart(dataset, index) {
     const chartContainer = $('<div class="chart-container"></div>');
+    const fileID = $('<div class="chart-title"></div>').text(`File ID: ${dataset.file_id}`);
+    chartContainer.append(fileID);
     $('#plotArea').append(chartContainer);
 
     const canvas = $('<canvas></canvas>');
     chartContainer.append(canvas);
 
     const ctx = canvas[0].getContext('2d');
+
+    // Assuming dataset includes 'data' and 'smoothed_data'
     const chartData = {
         labels: dataset.data.map((_, idx) => idx),
-        datasets: [{
-            label: `Dataset ${index + 1}`,
-            data: dataset.data,
-            fill: false,
-            borderColor: 'rgb(75, 192, 192)',
-            borderWidth: 1,
-            tension: 0.1
-        }]
+        datasets: [
+            {
+                label: `Dataset ${index + 1}`,
+                data: dataset.data,
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)', // Original data in blue
+                borderWidth: 1,
+                tension: 0.1
+            },
+            {
+                label: `Smoothed ${index + 1}`,
+                data: dataset.smoothed_data,
+                fill: false,
+                borderColor: 'rgb(255, 99, 132)', // Smoothed data in red
+                borderWidth: 3,
+                tension: 0.1
+            }
+        ]
     };
 
     const chart = new Chart(ctx, {
@@ -148,7 +225,6 @@ function createChart(dataset, index) {
 
     chartContainers.push(chart);
 }
-
 const chartOptions = {
     responsive: true,
     interaction: { mode: 'index', intersect: false },
