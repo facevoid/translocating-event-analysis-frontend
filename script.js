@@ -71,51 +71,24 @@ function attachEventHandlers() {
     });
 
     // Checkbox bindings
-    ['durationCheckbox', 'depthCheckbox', 'areaCheckbox', 'inflectionCheckbox'].forEach(checkboxId => {
+    ['durationCheckbox', 'depthCheckbox', 'areaCheckbox', 'inflectionCheckbox', 'categoryCheckbox'].forEach(checkboxId => {
         bindCheckboxWithSlider(checkboxId);
     });
 }
 
 function bindCheckboxWithSlider(checkboxId) {
-    const sliderId = '#' + checkboxId.replace('Checkbox', 'Slider');
+    const sliderId = '#' + checkboxId.replace('Checkbox', checkboxId.endsWith('SelectCheckbox') ? 'Select' : 'Slider');
     $('#' + checkboxId).change(function() {
         if (this.checked) {
-            $(sliderId).slider('enable');
+            $(sliderId).prop('disabled', false);
             $('#plotArea').removeClass('no-scroll');
         } else {
-            $(sliderId).slider('disable');
+            $(sliderId).prop('disabled', true);
             $('#plotArea').addClass('no-scroll');
         }
     });
 }
 
-
-// function appendSliderValuesToParams(checkboxId, sliderId, params, startParam, endParam,  scaleFactor = null) {
-//     const checkbox = document.getElementById(checkboxId);
-//     console.log('test')
-//     if (checkbox.checked) {
-//         const slider = $(sliderId).slider("option", "values");
-//         // Scale down the slider values if necessary before appending to parameters
-//         // const start = (slider[0] / scaleFactor).toFixed(6);  // Ensure that the number is formatted correctly
-//         // const end = (slider[1] / scaleFactor).toFixed(6);
-//         if (scaleFactor == 1) {
-//             // If scaleFactor is provided, apply exponential conversion
-//             start = Math.exp(slider[0] / scaleFactor).toFixed(6);
-//             end = Math.exp(slider[1] / scaleFactor).toFixed(6);
-//             console.log(start)
-//             console.log("Using Exponential Conversion:", start, end);
-
-//         } else {
-//             // If no scaleFactor is provided, use the values directly
-//             start = slider[0].toFixed(6);
-//             end = slider[1].toFixed(6);
-//             console.log("Using Conversion:", start, end);
-
-//         }
-//         params.append(startParam, start);
-//         params.append(endParam, end);
-//     }
-// }
 
 function fetchData() {
     const plotArea = $('#plotArea');
@@ -128,6 +101,7 @@ function fetchData() {
     appendSliderValuesToParams('depthCheckbox', '#depthSlider', params, 'depthStart', 'depthEnd', scaleFactor=0);
     appendSliderValuesToParams('areaCheckbox', '#areaSlider', params, 'skewnessStart', 'skewnessEnd', scaleFactor=0);
     appendSliderValuesToParams('inflectionCheckbox', '#inflectionSlider', params, 'inflectionStart', 'inflectionEnd', scaleFactor=0);
+    appendCategoryToParams(params);  // Append category filter
     console.log(`Fetching data with parameters: ${params.toString()}`);
     fetch(`http://localhost:8000/get-data?${params.toString()}`)
         .then(handleResponse)
@@ -157,7 +131,17 @@ function appendSliderValuesToParams(checkboxId, sliderId, params, startParam, en
         
     }
 }
-
+function appendCategoryToParams(params) {
+    if ($('#categoryCheckbox').is(':checked')) {
+        const category = $('#categorySelect').val();
+        if (category !== 'all') {
+            params.append('category', category);
+        }
+        // else {
+        //     params.append('category', 'all'); 
+        // }
+    }
+}
 function handleResponse(response) {
     if (!response.ok) throw new Error('Network response was not ok');
     return response.json();
@@ -231,7 +215,7 @@ const chartOptions = {
     plugins: { legend: { display: false }, tooltip: { enabled: false } },
     hover: { mode: null },
     animation: { duration: 0 },
-    scales: { x: { display: true }, y: { display: true } },
+    scales: { x: { display: true }, y: { display: true , suggestedMin: 200} },
     elements: { line: { tension: 0 }, point: { radius: 0 } }
 };
 

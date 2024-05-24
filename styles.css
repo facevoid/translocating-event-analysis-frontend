@@ -124,6 +124,18 @@ body {
     font-size: 14px;
     color: #333;
 }
+#percentageResults {
+  font-weight: bold; /* Make text bold */
+}
+#categorySelect {
+  padding: 8px 12px; /* Adds padding inside the dropdown */
+  border: 1px solid #ccc; /* Adds a border around the dropdown */
+  border-radius: 4px; /* Rounds the corners of the dropdown */
+  background-color: #698ad5; /* Sets a white background color */
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Adds a subtle shadow for depth */
+  margin-top: 5px; /* Adds space above the dropdown */
+}
+
  
   @media (max-width: 768px) {
     .chart-container {
